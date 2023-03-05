@@ -13,7 +13,8 @@ impl Default for Modifications {
     }
 }
 
-pub fn run(imgs: &Vec<String>) {
+pub fn run(target_path: &str) {
+    let imgs = directory_scanner::find_images(target_path);
     banner_and_clear_screen();
 
     if question("Do you want to work on all images? (Y/n)", "n") {
@@ -23,7 +24,8 @@ pub fn run(imgs: &Vec<String>) {
             };
             for filename in imgs {
                 println!("Processing {}", filename);
-                if let Err(e) = image_modifier::modify_image(&filename, &modifications) {
+                if let Err(e) = image_modifier::modify_image(&filename, &modifications, target_path)
+                {
                     println!("{} | Unable to modify {}", "Fail".red().bold(), filename);
                     println!("{}: {}", "Error".red(), e)
                 } else {
