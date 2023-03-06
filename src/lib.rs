@@ -37,7 +37,9 @@ pub fn run(target_path: &str) {
             println!("Currently unavailable.");
         }
     } else {
-        println!("Currently unavailable.");
+        banner_and_clear_screen();
+        choose_files(&mut imgs);
+        println!("{:?}", imgs);
     }
 }
 
@@ -96,6 +98,22 @@ fn choose_files(imgs: &mut Vec<String>) {
         if !included[i] {
             imgs.remove(i - true_index);
             true_index += 1;
+        }
+    }
+}
+
+fn print_available_files_with_selection(
+    imgs: &Vec<String>,
+    included: &Vec<bool>,
+    selected: &usize,
+) {
+    for i in 0..imgs.len() {
+        if selected == &i {
+            println!("{}", imgs[i].cyan().bold());
+        } else if included[i] {
+            println!("{}", imgs[i].green());
+        } else {
+            println!("{}", imgs[i]);
         }
     }
 }
