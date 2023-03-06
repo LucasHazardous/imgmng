@@ -58,3 +58,44 @@ fn banner_and_clear_screen() {
     print!("\x1B[2J\x1B[1;1H");
     println!("{}{}", "img".green().bold(), "mng".cyan().bold());
 }
+
+fn choose_files(imgs: &mut Vec<String>) {
+    let mut selected = 0;
+    let mut included = vec![false; imgs.len()];
+
+    let mut input = String::new();
+
+    while input.len() == 0 || input.chars().nth(0).unwrap() != 'a' {
+        banner_and_clear_screen();
+        println!("Select files for modification:");
+        input.clear();
+
+        print_available_files_with_selection(imgs, &included, &selected);
+        std::io::stdin().read_line(&mut input).unwrap();
+
+        match input.chars().nth(0).unwrap() {
+            'e' => {
+                included[selected] = !included[selected];
+            }
+            's' => {
+                selected = (selected + 1) % imgs.len();
+            }
+            'w' => {
+                selected = if selected as i32 - 1 < 0 {
+                    imgs.len() - 1
+                } else {
+                    selected - 1
+                };
+            }
+            _ => (),
+        }
+    }
+
+    let mut true_index = 0;
+    for i in 0..imgs.len() {
+        if !included[i] {
+            imgs.remove(i - true_index);
+            true_index += 1;
+        }
+    }
+}
