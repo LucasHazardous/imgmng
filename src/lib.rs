@@ -14,8 +14,9 @@ impl Default for Modifications {
 }
 
 pub fn run(target_path: &str) {
-    let imgs = directory_scanner::find_images(target_path);
+    let mut imgs = directory_scanner::find_images(target_path);
     banner_and_clear_screen();
+    println!("Found {} files.", imgs.len());
 
     if question("Do you want to work on all images? (Y/n)", "n") {
         if question("Do you want to apply modifications? (y/N)", "y") {
