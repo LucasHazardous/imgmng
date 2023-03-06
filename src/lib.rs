@@ -23,23 +23,32 @@ pub fn run(target_path: &str) {
             let modifications = Modifications {
                 ..Default::default()
             };
-            for filename in imgs {
-                println!("Processing {}", filename);
-                if let Err(e) = image_modifier::modify_image(&filename, &modifications, target_path)
-                {
-                    println!("{} | Unable to modify {}", "Fail".red().bold(), filename);
-                    println!("{}: {}", "Error".red(), e)
-                } else {
-                    println!("{} | Modified {}", "Success".green().bold(), filename);
-                }
-            }
+
+            modify_files(&imgs, target_path, &modifications);
         } else {
             println!("Currently unavailable.");
         }
     } else {
         banner_and_clear_screen();
+        let modifications = Modifications {
+            ..Default::default()
+        };
+
         choose_files(&mut imgs);
-        println!("{:?}", imgs);
+
+        modify_files(&imgs, target_path, &modifications);
+    }
+}
+
+fn modify_files(imgs: &Vec<String>, target_path: &str, modifications: &Modifications) {
+    for filename in imgs {
+        println!("Processing {}", filename);
+        if let Err(e) = image_modifier::modify_image(&filename, &modifications, target_path) {
+            println!("{} | Unable to modify {}", "Fail".red().bold(), filename);
+            println!("{}: {}", "Error".red(), e)
+        } else {
+            println!("{} | Modified {}", "Success".green().bold(), filename);
+        }
     }
 }
 
