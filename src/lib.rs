@@ -1,5 +1,6 @@
 pub mod directory_scanner;
 pub mod image_modifier;
+use std::error::Error;
 
 use colored::*;
 
@@ -18,26 +19,33 @@ pub fn run(target_path: &str) {
     banner_and_clear_screen();
     println!("Found {} files.", imgs.len());
 
-    if question("Do you want to work on all images? (Y/n)", "n") {
-        if question("Do you want to apply modifications? (y/N)", "y") {
-            let modifications = Modifications {
-                ..Default::default()
-            };
-
-            modify_files(&imgs, target_path, &modifications);
-        } else {
-            println!("Currently unavailable.");
-        }
-    } else {
+    if !question("Do you want to work on all images? (Y/n)", "n") {
         banner_and_clear_screen();
-        let modifications = Modifications {
-            ..Default::default()
-        };
 
         choose_files(&mut imgs);
-
-        modify_files(&imgs, target_path, &modifications);
+        banner_and_clear_screen();
     }
+
+    let modifications;
+    if question("Do you want to apply modifications? (y/N)", "y") {
+        modifications = Modifications {
+            ..Default::default()
+        };
+    } else {
+        let resize = match ask_for_modification_value("Enter resize (from 1 to 100):") {
+            Ok(x) => {
+                if x >= 1.0 && x <= 100.0 {
+                    x / 100.0
+                } else {
+                    0.01
+                }
+            }
+            Err(_e) => 1.0,
+        };
+        modifications = Modifications { resize };
+    }
+
+    modify_files(&imgs, target_path, &modifications);
 }
 
 fn modify_files(imgs: &Vec<String>, target_path: &str, modifications: &Modifications) {
@@ -50,6 +58,19 @@ fn modify_files(imgs: &Vec<String>, target_path: &str, modifications: &Modificat
             println!("{} | Modified {}", "Success".green().bold(), filename);
         }
     }
+}
+
+fn ask_for_modification_value(content: &str) -> Result<f32, Box<dyn Error>> {
+    println!("{}", content);
+
+    let mut input = String::new();
+    std::io::stdin().read_line(&mut input)?;
+
+    banner_and_clear_screen();
+
+    let res = input.trim().parse::<f32>()?;
+
+    Ok(res)
 }
 
 fn question(content: &str, nondefault: &str) -> bool {
