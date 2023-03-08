@@ -7,11 +7,15 @@ use std::error::Error;
 
 pub struct Modifications {
     resize: f32,
+    invert: bool,
 }
 
 impl Default for Modifications {
     fn default() -> Self {
-        Modifications { resize: 1.0 }
+        Modifications {
+            resize: 1.0,
+            invert: false,
+        }
     }
 }
 
@@ -43,7 +47,10 @@ pub fn run(target_path: &str) {
             }
             Err(_e) => 1.0,
         };
-        modifications = Modifications { resize };
+
+        let invert = !question("Invert colors? (y/N)", "y");
+
+        modifications = Modifications { resize, invert };
     }
 
     modify_files(&imgs, target_path, &modifications);
