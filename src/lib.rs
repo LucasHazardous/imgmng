@@ -1,8 +1,9 @@
 pub mod directory_scanner;
 pub mod image_modifier;
-use std::error::Error;
+mod printer;
+use printer::*;
 
-use colored::*;
+use std::error::Error;
 
 pub struct Modifications {
     resize: f32,
@@ -51,12 +52,8 @@ pub fn run(target_path: &str) {
 fn modify_files(imgs: &Vec<String>, target_path: &str, modifications: &Modifications) {
     for filename in imgs {
         println!("Processing {}", filename);
-        if let Err(e) = image_modifier::modify_image(&filename, &modifications, target_path) {
-            println!("{} | Unable to modify {}", "Fail".red().bold(), filename);
-            println!("{}: {}", "Error".red(), e)
-        } else {
-            println!("{} | Modified {}", "Success".green().bold(), filename);
-        }
+        let res = image_modifier::modify_image(&filename, &modifications, target_path);
+        print_processed_filename(res, filename);
     }
 }
 
@@ -84,11 +81,6 @@ fn question(content: &str, nondefault: &str) -> bool {
     banner_and_clear_screen();
 
     !(first_character == nondefault)
-}
-
-fn banner_and_clear_screen() {
-    print!("\x1B[2J\x1B[1;1H");
-    println!("{}{}", "img".green().bold(), "mng".cyan().bold());
 }
 
 fn choose_files(imgs: &mut Vec<String>) {
@@ -128,22 +120,6 @@ fn choose_files(imgs: &mut Vec<String>) {
         if !included[i] {
             imgs.remove(i - true_index);
             true_index += 1;
-        }
-    }
-}
-
-fn print_available_files_with_selection(
-    imgs: &Vec<String>,
-    included: &Vec<bool>,
-    selected: &usize,
-) {
-    for i in 0..imgs.len() {
-        if selected == &i {
-            println!("{}", imgs[i].cyan().bold());
-        } else if included[i] {
-            println!("{}", imgs[i].green());
-        } else {
-            println!("{}", imgs[i]);
         }
     }
 }
