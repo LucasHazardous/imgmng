@@ -24,22 +24,29 @@ pub fn modify_image(
     let img_x = img.dimensions().0 as f32;
     let img_y = img.dimensions().1 as f32;
 
-    let mut imgbuf = image::ImageBuffer::from(img.to_rgb8());
-    for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
-        let pixel_rgb = pixel.0;
-        let bonus = ((x as f32 / img_x + y as f32 / img_y) * 255.0 * 0.5) as u32;
+    if modifications.special {
+        let mut imgbuf = image::ImageBuffer::from(img.to_rgb8());
+        for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
+            let pixel_rgb = pixel.0;
+            let bonus = ((x as f32 / img_x + y as f32 / img_y) * 255.0 * 0.5) as u32;
 
-        *pixel = image::Rgb([
-            ((pixel_rgb[0] as u32 + bonus) % 255) as u8,
-            ((pixel_rgb[1] as u32 + bonus) % 255) as u8,
-            ((pixel_rgb[2] as u32 + bonus) % 255) as u8,
-        ]);
+            *pixel = image::Rgb([
+                ((pixel_rgb[0] as u32 + bonus) % 255) as u8,
+                ((pixel_rgb[1] as u32 + bonus) % 255) as u8,
+                ((pixel_rgb[2] as u32 + bonus) % 255) as u8,
+            ]);
+        }
+
+        imgbuf.save_with_format(
+            Path::new(&format!("{}modified/{}", target_path, filename)),
+            image::ImageFormat::Jpeg,
+        )?;
+    } else {
+        img.save_with_format(
+            Path::new(&format!("{}modified/{}", target_path, filename)),
+            image::ImageFormat::Jpeg,
+        )?;
     }
-
-    imgbuf.save_with_format(
-        Path::new(&format!("{}modified/{}", target_path, filename)),
-        image::ImageFormat::Jpeg,
-    )?;
 
     Ok(())
 }
