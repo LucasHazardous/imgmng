@@ -1,5 +1,5 @@
-pub mod directory_scanner;
-pub mod image_modifier;
+mod directory_scanner;
+mod image_modifier;
 mod printer;
 use printer::*;
 
