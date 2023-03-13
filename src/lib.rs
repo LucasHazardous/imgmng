@@ -4,6 +4,7 @@ mod printer;
 use printer::*;
 
 use std::error::Error;
+use std::fmt;
 
 pub struct Modifications {
     resize: f32,
@@ -18,6 +19,18 @@ impl Default for Modifications {
             invert: false,
             special: false,
         }
+    }
+}
+
+impl fmt::Display for Modifications {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "Resize: {} | Invert: {} | Special: {}",
+            self.resize,
+            if self.invert { "Yes" } else { "No" },
+            if self.special { "Yes" } else { "No" }
+        )
     }
 }
 
@@ -67,6 +80,7 @@ pub fn run(target_path: &str, imgs: Vec<String>) {
         };
     }
 
+    println!("{}", modifications);
     modify_files(&imgs, target_path, &modifications);
 }
 
