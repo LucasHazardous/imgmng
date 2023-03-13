@@ -21,12 +21,18 @@ impl Default for Modifications {
     }
 }
 
-pub fn run(target_path: &str) {
-    let mut imgs = directory_scanner::find_images(target_path);
+pub fn run(target_path: &str, imgs: Vec<String>) {
+    let custom_img_list = imgs.len() > 0;
+    let mut imgs = imgs;
+
+    if !custom_img_list {
+        imgs = directory_scanner::find_images(target_path);
+    }
+
     banner_and_clear_screen();
     println!("Found {} files.", imgs.len());
 
-    if !question("Do you want to work on all images? (Y/n)", "n") {
+    if !custom_img_list && !question("Do you want to work on all images? (Y/n)", "n") {
         banner_and_clear_screen();
 
         choose_files(&mut imgs);
